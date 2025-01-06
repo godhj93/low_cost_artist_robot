@@ -41,7 +41,7 @@ RUN rosdep init \
 RUN pip install --upgrade pip
 
 # Install additional packages for Stable Diffusion
-RUN pip install transformers diffusers vtracer svgpathtool
+RUN pip install transformers diffusers vtracer svgpathtools
 
 # Install MuJoCo
 
