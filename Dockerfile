@@ -20,7 +20,7 @@ RUN apt-get update \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Add ROS repository and install ROS Melodic
+# Add ROS repository and install ROS Noetic
 RUN sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list' \
     && curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | apt-key add - \
     && apt-get update \
@@ -41,7 +41,7 @@ RUN rosdep init \
 RUN pip install --upgrade pip
 
 # Install additional packages for Stable Diffusion
-RUN pip install transformers diffusers vtracer svgpathtools
+RUN pip install transformers diffusers==0.29.0 vtracer svgpathtools accelerate
 
 # Install MuJoCo
 
