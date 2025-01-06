@@ -1,0 +1,1 @@
+docker build -t low_cost_artist:latest .
