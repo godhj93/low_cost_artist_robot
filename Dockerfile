@@ -43,7 +43,7 @@ RUN apt install -y python3-catkin-tools
 RUN pip install --upgrade pip
 
 # Install additional packages for Stable Diffusion
-RUN pip install transformers diffusers==0.29.0 vtracer svgpathtools accelerate gtts pyaudio
+RUN pip install transformers diffusers==0.29.0 vtracer svgpathtools accelerate gtts
 RUN apt install -y python3-pyaudio
 
 # Install Whisper
