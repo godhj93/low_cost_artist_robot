@@ -2,7 +2,7 @@
 
 from __future__ import print_function
 
-from lerobot_ros.srv import DrawingRequest, DrawingRequestResponse, DrawingCompleted, DrawingCompletedResponse
+from lerobot.srv import DrawingRequest, DrawingRequestResponse, DrawingCompleted, DrawingCompletedResponse
 import rospy
 from geometry_msgs.msg import Point
 from visualization_msgs.msg import Marker

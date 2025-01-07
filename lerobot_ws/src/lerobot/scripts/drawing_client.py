@@ -250,7 +250,7 @@ if __name__ == "__main__":
                 rospy.logerr(f"Failed to requesting drawing for file: {file_path}")
 
             while not complete_service().success:
-                rospy.loginfo("Waiting for the drawing server to complete the task.")
+                # rospy.loginfo("Waiting for the drawing server to complete the task.")
                 rospy.sleep(1)
                 
                 if rospy.is_shutdown():
