@@ -37,7 +37,7 @@ RUN apt-get install -y python3-rosdep
 RUN rosdep init \
     && rosdep update
 
-RUN apt install python3-catkin-tools
+RUN apt install -y python3-catkin-tools
 
 # Update pip
 RUN pip install --upgrade pip
@@ -48,7 +48,7 @@ RUN apt install -y python3-pyaudio
 
 # Install Whisper
 RUN pip install -U openai-whisper
-RUN apt install mpg123 ffmpeg
+RUN apt install -y mpg123 ffmpeg
 
 # Install MuJoCo
 RUN pip install mujoco termcolor dynamixel_sdk
