@@ -1,4 +1,14 @@
 <launch>
-  <!-- Python 노드를 실행 -->
-  <node pkg="lerobot" type="main.py" name="lerobot_node" output="screen" />
+  <!-- world_tf.py 노드 실행 -->
+  <node pkg="lerobot" type="world_tf.py" name="world_tf_node" output="screen" />
+
+  <!-- drawing_server.py 노드 실행 -->
+  <node pkg="lerobot" type="drawing_server.py" name="drawing_server_node" output="screen" />
+
+  <!-- drawing_client.py 노드 실행 -->
+  <node pkg="lerobot" type="drawing_client.py" name="drawing_client_node" output="screen" />
+ 
+  <!-- RViz 실행 -->
+  <node pkg="rviz" type="rviz" name="rviz" args="-d $(find lerobot)/config/lerobot_rviz.rviz" output="screen" />
+
 </launch>
