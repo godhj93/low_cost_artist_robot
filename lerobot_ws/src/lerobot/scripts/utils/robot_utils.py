@@ -34,7 +34,7 @@ def initialize_simulator(Hz = 100.0):
     print(colored("Simulator Initialized!", 'green'))
     return robot, world, data
     
-def load_world(world_path = '/root/lerobot_ros/catkin_ws/src/lerobot_ros/scripts/low_cost_robot/scene.xml'):
+def load_world(world_path = '/root/low_cost_artist_robot/lerobot_ws/src/lerobot/scripts/low_cost_robotscene.xml'):
         
     # Load world and data
     world = mujoco.MjModel.from_xml_path(world_path)
