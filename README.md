@@ -68,10 +68,6 @@ xhost +
 
 ![xhost](figures/enable_gui.png)
 
-Then, run the container with the following command:
-
-```bash
-
 When you successfully run the container, you can access ROS workspace as follows:
 
 ```bash
