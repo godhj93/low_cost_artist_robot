@@ -9,6 +9,6 @@
   <node pkg="lerobot" type="drawing_client.py" name="drawing_client_node" output="screen" />
  
   <!-- RViz 실행 -->
-  <node pkg="rviz" type="rviz" name="rviz" args="-d $(find lerobot)/config/lerobot_rviz.rviz" output="screen" />
+  <node pkg="rviz" type="rviz" name="rviz" args="-d $(find lerobot)/config/lerobot.rviz" output="screen" />
 
 </launch>
