@@ -54,10 +54,10 @@ sh build.sh
 # To run the container
 sh run.sh
 ```
-When you successfully run the container, you will be inside the container as shown below:
+When you successfully build the image and run the container, you will be inside the container as shown below:
 
-
-[FIGURE]
+![build_image](figures/build_image.png)
+![run_container](figures/run_container.png)
 
 Since MuJoCo is used for simulating kocv1.1, we need GUI support. To run the container with GUI support, run the following command:
 
@@ -66,7 +66,11 @@ Since MuJoCo is used for simulating kocv1.1, we need GUI support. To run the con
 xhost +
 ```
 
-[FIGURE]
+![xhost](figures/enable_gui.png)
+
+Then, run the container with the following command:
+
+```bash
 
 When you successfully run the container, you can access ROS workspace as follows:
 
