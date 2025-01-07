@@ -37,12 +37,67 @@ For now it is only adapted for OSX (Apple) environments. But feel free to adapt 
 
 ## 2. Setup
 
+<!-- 
 1. Create or join a cloud folder (e.g. on Dropbox or Drive) where large non-versioned files will reside.
 2. Clone this repository to a local folder *outside* the cloud folder.
 3. Fill out the correct environment paths in `setup.sh`.
 4. Run `sh setup.sh` to create symbolic links to all non-versioned folders.
 
-You're good to go. This repository is now ready for the standard workflow described below.
+You're good to go. This repository is now ready for the standard workflow described below. -->
+
+We provide a Dockerfile to create an image with all the necessary tools to run the workflow. To build the image, run the following command:
+
+```bash
+# To build the image
+sh build.sh
+
+# To run the container
+sh run.sh
+```
+When you successfully run the container, you will be inside the container as shown below:
+
+
+[FIGURE]
+
+Since MuJoCo is used for simulating kocv1.1, we need GUI support. To run the container with GUI support, run the following command:
+
+```bash
+# In another terminal, run the following command
+xhost +
+```
+
+[FIGURE]
+
+When you successfully run the container, you can access ROS workspace as follows:
+
+```bash
+# To move to the workspace
+cd ~/low_cost_artist_robot/lerobot_ws/
+
+# build source code
+catkin build
+
+# source the workspace
+source devel/setup.bash
+```
+
+To run the simulation, run the following command:
+
+```bash
+# To fix link error to use CUDA, run the following command
+ldconfig
+# To run the low cost artist robot in the simulation
+roslaunch lerobot simulation.launch
+```
+
+## 3. Real Robot Configuration
+
+TO BE IMPLEMENTED
+1. Kocv description
+2. Pen holder description
+3. How to assemble the robot
+4. How to connect the robot to the computer
+5. How to run the robot
 
 ## 3. Folders
 
