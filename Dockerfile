@@ -51,7 +51,7 @@ RUN pip install -U openai-whisper
 RUN apt install mpg123 ffmpeg
 
 # Install MuJoCo
-RUN pip install mujoco
+RUN pip install mujoco termcolor dynamixel_sdk
 
 # Set the working directory in the container
 WORKDIR /root/
