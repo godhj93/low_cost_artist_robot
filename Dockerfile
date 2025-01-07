@@ -37,13 +37,23 @@ RUN apt-get install -y python3-rosdep
 RUN rosdep init \
     && rosdep update
 
+RUN apt install python3-catkin-tools
+
 # Update pip
 RUN pip install --upgrade pip
 
 # Install additional packages for Stable Diffusion
-RUN pip install transformers diffusers==0.29.0 vtracer svgpathtools accelerate
+RUN pip install transformers diffusers==0.29.0 vtracer svgpathtools accelerate gtts pyaudio
+RUN apt install -y python3-pyaudio
+
+# Install Whisper
+RUN pip install -U openai-whisper
+RUN apt install mpg123 ffmpeg
 
 # Install MuJoCo
+RUN pip install mujoco
 
 # Set the working directory in the container
 WORKDIR /root/
+
+RUN git clone https://github.com/godhj93/low_cost_artist_robot.git

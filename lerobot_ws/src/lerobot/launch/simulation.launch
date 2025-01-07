@@ -1,0 +1,4 @@
+<launch>
+  <!-- Python 노드를 실행 -->
+  <node pkg="lerobot" type="main.py" name="lerobot_node" output="screen" />
+</launch>
