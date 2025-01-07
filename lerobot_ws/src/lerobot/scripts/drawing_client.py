@@ -160,7 +160,7 @@ if __name__ == "__main__":
     
     assert torch.cuda.is_available(), "CUDA is not available. Please install CUDA."
     
-    rospy.init_node("drawing_client")
+    rospy.init_node("drawing_client", anonymous=True)
     
     # Wait for the service to be available
     rospy.loginfo("Waiting for the drawing service to be available.")
