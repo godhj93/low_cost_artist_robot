@@ -8,3 +8,10 @@ output/logs
 output/logs/
 tmp
 tmp/
+
+lerobot_ws/build
+lerobot_ws/source
+lerobot_ws/devel
+lerobot_ws/.catkin_tools
+lerobot_ws/logs
+lerobot_ws/**/**/__pycache__
