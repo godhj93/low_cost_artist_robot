@@ -13,9 +13,7 @@ This repository contains the code and data for the paper **"Demonstrating Artist
 
 ## 2. Setup
 
-### 2.1 Simulation Setup
-
-- We provide a Dockerfile to create an image with all the necessary tools to run the workflow. To build the image, run the following command:
+We provide a Dockerfile to create an image with all the necessary tools to run the workflow. To build the image, run the following command:
 
 ```bash
 # To build the image
@@ -24,12 +22,12 @@ sh build.sh
 # To run the container
 sh run.sh
 ```
-- When you successfully build the image and run the container, you will be inside the container as shown below:
+When you successfully build the image and run the container, you will be inside the container as shown below:
 
 ![build_image](figures/build_image.png)
 ![run_container](figures/run_container.png)
 
-- Since MuJoCo is used for simulating koch1.1, we need GUI support. To run the container with GUI support, run the following command:
+Since MuJoCo is used for simulating koch1.1, we need GUI support. To run the container with GUI support, run the following command:
 
 ```bash
 # In another terminal, run the following command
@@ -38,7 +36,7 @@ xhost +
 
 ![xhost](figures/enable_gui.png)
 
-- When you successfully run the container, you can access ROS workspace as follows:
+When you successfully run the container, you can access ROS workspace as follows:
 
 ```bash
 # To move to the workspace
@@ -51,7 +49,7 @@ catkin build
 source devel/setup.bash
 ```
 
-- To run the simulation, run the following command:
+To run the simulation, run the following command:
 
 ```bash
 # To fix link error to use CUDA, run the following command
