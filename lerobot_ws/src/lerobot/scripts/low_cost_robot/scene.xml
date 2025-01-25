@@ -17,6 +17,12 @@
     <texture type="2d" name="groundplane" builtin="checker" mark="edge" rgb1="0.2 0.3 0.4" rgb2="0.1 0.2 0.3"
       markrgb="0.8 0.8 0.8" width="300" height="300"/>
     <material name="groundplane" texture="groundplane" texuniform="true" texrepeat="5 5" reflectance="0.2"/>
+
+    <material name="j1" rgba="1 0 0 1"/>
+    <material name="j2" rgba="0 1 0 1"/>
+    <material name="j3" rgba="0 0 1 1"/>
+    <material name="j4" rgba="1 1 0 1"/>
+    <material name="j5" rgba="1 0 1 1"/>
   </asset>
 
   <worldbody>
@@ -25,16 +31,39 @@
 
 
     <geom name="floor" size="0 0 0.05" type="plane" material="groundplane" pos="0 0 0" friction="0.1"/>
-    <!-- <body name="box" pos="0.0 0.2 0.01">
-        <freejoint name="red_box_joint"/>
+
+    <body name="white_board" pos="-0.05 0.2 0.01">
         <inertial pos="0 0 0" mass="0.1" diaginertia="0.00016667 0.00016667 0.00016667"/>
-        <geom friction="0.5" condim="3" pos="0 0 0" size="0.015 0.015 0.015" type="box" name="red_box" rgba="0.5 0 0 1" priority="1"/>
+        <geom friction="0.2 0.01 0.001" condim="3" pos="0.08 0.15 0" size="0.2 0.2 0.001" type="box" name="white_board" rgba="1 1 1 1" priority="1"/>
     </body>
-    <body name="box2" pos="-0.04 0.18 0.01">
-        <freejoint name="blue_box_joint"/>
-        <inertial pos="0 0 0" mass="0.1" diaginertia="0.00016667 0.00016667 0.00016667"/>
-        <geom friction="0.5" condim="3" pos="0 0 0" size="0.015 0.015 0.015" type="box" name="blue_box" rgba="0.0 0 0.5 1" priority="1"/>
+
+    
+    <!-- Target Marker for EE Visualization -->
+<!-- 
+    <body name="j1_body" pos="0 0 0">
+        <geom name="j1_geom" type="sphere" size="0.02" rgba="1 0 0 1"/>
     </body> -->
+
+    <!-- <body name="j2_body" pos="0 0 0">
+        <joint name="j2_joint" type="free"/>
+        <geom name="j2_geom" type="sphere" size="0.05" rgba="0 1 0 1"/>
+    </body>
+
+    <body name="j3_body" pos="0 0 0">
+        <joint name="j3_joint" type="free"/>
+        <geom name="j3_geom" type="sphere" size="0.05" rgba="0 0 1 1"/>
+    </body>
+
+    <body name="j4_body" pos="0 0 0">
+        <joint name="j4_joint" type="free"/>
+        <geom name="j4_geom" type="sphere" size="0.05" rgba="1 1 0 1"/>
+    </body>
+
+    <body name="j5_body" pos="0 0 0">
+        <joint name="j5_joint" type="free"/>
+        <geom name="j5_geom" type="sphere" size="0.05" rgba="1 0 1 1"/>
+    </body> -->
+
   </worldbody>
 
 </mujoco>

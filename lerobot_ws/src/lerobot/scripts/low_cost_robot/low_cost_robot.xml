@@ -1,78 +1,129 @@
 <mujoco model="low_cost_robot">
     <compiler angle="radian" meshdir="assets" texturedir="assets" autolimits="true"/>
-    <!-- The timestep has a big influence on the contacts stability -->
     <option cone="elliptic" impratio="10" timestep="0.001"/>
+
     <asset>
-        <mesh file="base_link.stl" scale="0.001 0.001 0.001"/>
-        <mesh file="first-bracket-motor_1.stl" scale="0.001 0.001 0.001"/>
-        <mesh file="shoulder-to-elbow-motor_v1_1.stl" scale="0.001 0.001 0.001"/>
-        <mesh file="elbow-to-wrist-motor-reference_v1_1.stl" scale="0.001 0.001 0.001"/>
-        <mesh file="elbow_to_wrist_with_motor.stl" scale="0.001 0.001 0.001"/>
-        <mesh file="gripper-static-motor-pt1.stl" scale="0.001 0.001 0.001"/>
-        <mesh file="gripper-static-motor-pt2.stl" scale="0.001 0.001 0.001"/>
-        <mesh file="robot_ee_pen.stl" scale="0.001 0.001 0.001"/>
-        <mesh file="gripper-moving-part-dumb_v2_1.stl" scale="0.001 0.001 0.001"/>
+        <mesh file="/root/low_cost_artist_robot/lerobot_ws/src/lerobot/scripts/low_cost_robot/assets/STL/Follower_Base.stl" scale="0.001 0.001 0.001"/>
+        <mesh file="/root/low_cost_artist_robot/lerobot_ws/src/lerobot/scripts/low_cost_robot/assets/STL/Follower_Shoulder_Rotation.stl" scale="0.001 0.001 0.001"/>
+        <mesh file="/root/low_cost_artist_robot/lerobot_ws/src/lerobot/scripts/low_cost_robot/assets/STL/Follower_Shoulder_To_Elbow.stl" scale="0.001 0.001 0.001"/>
+        <mesh file="/root/low_cost_artist_robot/lerobot_ws/src/lerobot/scripts/low_cost_robot/assets/STL/Follower_Elbow_To_Wrist_Extension.stl" scale="0.001 0.001 0.001"/>
+        <mesh file="/root/low_cost_artist_robot/lerobot_ws/src/lerobot/scripts/low_cost_robot/assets/STL/Follower_Elbow_To_Wrist.stl" scale="0.001 0.001 0.001"/>
+        <mesh file="/root/low_cost_artist_robot/lerobot_ws/src/lerobot/scripts/low_cost_robot/assets/STL/Pen_Holder.stl" scale="0.001 0.001 0.001"/>
+        <mesh file="/root/low_cost_artist_robot/lerobot_ws/src/lerobot/scripts/low_cost_robot/assets/STL/Pen.stl" scale="0.001 0.001 0.001"/>
+        <mesh file="/root/low_cost_artist_robot/lerobot_ws/src/lerobot/scripts/low_cost_robot/assets/STL/XL-330.stl" scale="0.001 0.001 0.001"/>
+        <mesh file="/root/low_cost_artist_robot/lerobot_ws/src/lerobot/scripts/low_cost_robot/assets/STL/XL-430.stl" scale="0.001 0.001 0.001"/>
     </asset>
+
     <default>
         <default class="low_cost_robot">
             <general biastype="affine"/>
             <joint axis="0 1 0"/>
-            <default class="joint1">
-                <joint axis="0 0 1" range="-3.14158 3.14158" damping="0.5"/>
-                <position ctrlrange="-3.14158 3.14158" kp="50"/>
-            </default>
-            <default class="joint2">
-                <joint axis="1 0 0" range="-3.14158 3.14158" damping="0.5"/>
-                <position ctrlrange="-3.14158 3.14158" kp="10"/>
-            </default>
-            <default class="joint3">
-                <joint axis="1 0 0" range="-3.14158 3.14158" damping="0.5"/>
-                <position ctrlrange="-3.14158 3.14158" kp="10"/>
-            </default>
-            <default class="joint4">
-                <joint axis="-1 0 0" range="-3.14158 3.14158" damping="0.5"/>
-                <position ctrlrange="-3.14158 3.14158" kp="10"/>
-            </default>
-            <default class="joint5">
-                <joint axis="0 1 0" range="-3.14158 3.14158" damping="0.5"/>
-                <position ctrlrange="-3.14158 3.14158" kp="10"/>
-            </default>
-            <default class="joint6">
-                <joint axis="0 0 1" range="-2.45 0.032" damping="0.5"/>
-                <position ctrlrange="-1.52 0.032" kp="10"/>
-            </default>
+        </default>
+        <!-- 조인트별 기본 세팅 -->
+        <default class="joint1">
+            <joint axis="0 0 1" range="-3.14158 3.14158" damping="0.5"/>
+            <position ctrlrange="-3.14158 3.14158" kp="50"/>
+        </default>
+        <default class="joint2">
+            <joint axis="1 0 0" range="-3.14158 3.14158" damping="0.5"/>
+            <position ctrlrange="-3.14158 3.14158" kp="10"/>
+        </default>
+        <default class="joint3">
+            <joint axis="1 0 0" range="-3.14158 3.14158" damping="0.5"/>
+            <position ctrlrange="-3.14158 3.14158" kp="10"/>
+        </default>
+        <default class="joint4">
+            <joint axis="-1 0 0" range="-3.14158 3.14158" damping="0.5"/>
+            <position ctrlrange="-3.14158 3.14158" kp="10"/>
+        </default>
+        <default class="joint5">
+            <joint axis="0 1 0" range="-3.14158 3.14158" damping="0.5"/>
+            <position ctrlrange="-3.14158 3.14158" kp="10"/>
         </default>
     </default>
-    <worldbody>
-        <body name="base_link" pos="0 0 0">
-            <geom type="mesh" name="base_link" mesh="base_link" rgba="0.1 0.1 0.1 1"/>
-            <body name="joint1" pos="0 0.07 0.0">
-                <joint name="joint1" axis="0 0 1" pos="0 0 0" class="joint1"/>
-                <geom type="mesh" name="joint1" pos="0 -0.07 0" mesh="first-bracket-motor_1" rgba="0.1 0.1 0.1 1"/>
-                <body name="joint2" pos="0 0 0.055">
-                    <joint name="joint2" axis="-1 0 0" class="joint2"/>
-                    <geom type="mesh" pos="0 -0.07 -0.055" name="joint2" mesh="shoulder-to-elbow-motor_v1_1" rgba="0.1 0.1 0.1 1"/>
-                    <body name="joint3" pos="0.0 0.0135 0.108">
-                        <joint name="joint3" axis="1 0 0" class="joint3"/>
-                        <geom pos="-0.0138 -0.0075 -0.0141" type="mesh" name="joint3" mesh="elbow_to_wrist_with_motor" rgba="0.1 0.1 0.1 1"/>
-                        <body name="joint4" pos="0 0.091 0.0035">
-                            <joint name="joint4" class="joint4"/>
-                            <geom pos="0 -0.084 -0.163" type="mesh" name="joint4" mesh="elbow-to-wrist-motor-reference_v1_1" rgba="0.1 0.1 0.1 1"/>
-                            <body name="joint5" pos="0 0.04 0">
-                                <joint name="joint5" class="joint5"/>
-                                <geom pos="0 -0.125 -0.163" type="mesh" name="joint5-pt1" mesh="gripper-static-motor-pt1" rgba="0.1 0.1 0.1 1"/>
-                                <geom pos="0 -0.125 -0.163" type="mesh" name="joint5" mesh="gripper-static-motor-pt2" rgba="0.1 0.1 0.1 1" contype="0" conaffinity="0"/>
-                                <body name="joint5-pad">
-                                    <geom type="box" condim="3" friction="0.7" mass="0.01" solimp="0.95 0.99 0.001" solref="0.004 1" name="static_finger_pad" size="0.006 0.006 0.006" pos="0.0135 0.07 0.0" priority="1" rgba="0 0 0.8 0"/>
-                                </body>
 
-                                <!-- <body name="joint6" pos="0 0 0">
-                                    <joint pos="-0.009 0.0165 0" name="joint6" class="joint6"/>
-                                    <geom pos="0 -0.125 -0.163" type="mesh" name="joint6" mesh="robot_ee_pen" rgba="0.1 0.1 0.1 1" contype="0" conaffinity="0"/>
-                                    <body name="joint6-pad">
-                                        <geom type="box" condim="3" friction="0.7" mass="0.01" solimp="0.95 0.99 0.001" solref="0.004 1" name="moving_finger_pad" size="0.006 0.006 0.006" pos="0 0.07 0" euler="0 0 -0.3" priority="1" rgba="0 0 0.8 0"/>
-                                    </body>
-                                </body> -->
+    <worldbody>
+        <!-- 로봇 베이스 -->
+        <body name="Follower_Base" pos="-0.05 0 0.01">
+            <geom type="mesh" name="Follower_Base" pos="0 0 0" mesh="Follower_Base" rgba="1 1 1 1"/>
+
+            <!-- (1) joint1 서보(모터) 하우징은 '부모'인 Follower_Base 쪽에 놓음 -->
+            <geom type="mesh" name="servo_joint1" pos="0.067 0.115 0.02"
+                  mesh="XL-430" rgba="0.1 0.1 0.1 1"/>
+
+            <!-- (1) 실제로 회전하는 링크(Follower_Shoulder_Rotation)는 '자식 바디'에 두어야 함 -->
+            <body name="link1" pos="0.067 0.115 0.02">
+                <joint name="joint1" axis="0 0 1" pos="0 0 0" class="joint1"/>
+                <geom type="mesh" name="Follower_Shoulder_Rotation" 
+                      pos="-0.020 -0.115 0.019" 
+                      mesh="Follower_Shoulder_Rotation" rgba="1 1 1 1"/>
+
+                <!-- (2) joint2 서보(모터) -->
+                <geom type="mesh" name="servo_joint2"
+                      pos="0 0 0.038" quat="-0.707 0 0.707 0"
+                      mesh="XL-430" rgba="0.1 0.1 0.1 1"/>
+
+                <body name="link2" pos="0 0 0.038">
+                    <joint name="joint2" axis="-1 0 0" class="joint2"/>
+                    <geom type="mesh"
+                          pos="-0.021 -0.118 -0.013"
+                          quat="0.707106781 -0.707106781 0 0"
+                          name="Follower_Shoulder_To_Elbow"
+                          mesh="Follower_Shoulder_To_Elbow"
+                          rgba="1 1 1 1"/>
+
+                    <!-- (3) joint3 서보(모터) -->
+                    <geom type="mesh" name="servo_joint3"
+                          pos="-0.01 0.013 0.108"
+                          quat="-0.707106781 0.0 0.707106781 0.0"
+                          mesh="XL-330" rgba="0.1 0.1 0.1 1"/>
+
+                    <body name="link3" pos="-0.01 0.013 0.108">
+                        <joint name="joint3" axis="1 0 0" class="joint3"/>
+                       
+
+                        <geom pos="0.025 0.08 -0.01" quat="0 0 0 1"
+                              type="mesh" name="Follower_Elbow_To_Wrist_Extension"
+                              mesh="Follower_Elbow_To_Wrist_Extension" rgba="1 1 1 1"/>
+                        
+                        <!-- (4) joint4 서보(모터) -->
+                        <geom type="mesh" name="servo_joint4"
+                              pos="0.0 0.1 0.0"
+                              quat="-0.70710678 0.0 0.70710678 0.0"
+                              mesh="XL-330" rgba="0.1 0.1 0.1 1"/>
+
+                        <body name="link4" pos="-0.0 0.1 0.0">
+                            <joint name="joint4" class="joint4"/>
+                              <!-- <geom type="cylinder" fromto="0 0 0 0.1 0 0" size="0.002" rgba="1 0 0 1"/>
+                              <geom type="cylinder" fromto="0 0 0 0 0.1 0" size="0.002" rgba="0 1 0 1"/>
+                              <geom type="cylinder" fromto="0 0 0 0 0 0.1" size="0.002" rgba="0 0 1 1"/> -->
+                            <geom pos="0.025 0.065 0.22"
+                                  quat="0.0 0.0 -0.70710678 0.70710678"
+                                  type="mesh" name="Follower_Elbow_To_Wrist"
+                                  mesh="Follower_Elbow_To_Wrist"
+                                  rgba="1 1 1 1"/>
+
+                            <!-- (5) joint5 서보(모터) -->
+                            <geom type="mesh" name="servo_joint5"
+                                  pos="-0.005 0.04 -0.002"
+                                  quat="0.5 -0.5 0.5 0.5"
+                                  mesh="XL-330" rgba="0.1 0.1 0.1 1"/>
+
+                            <body name="link5" pos="-0.005 0.04 -0.002">
+                              <!-- <geom type="cylinder" fromto="0 0 0 0.1 0 0" size="0.002" rgba="1 0 0 1"/>
+                              <geom type="cylinder" fromto="0 0 0 0 0.1 0" size="0.002" rgba="0 1 0 1"/>
+                              <geom type="cylinder" fromto="0 0 0 0 0 0.1" size="0.002" rgba="0 0 1 1"/> -->
+                                <joint name="joint5" class="joint5"/>
+                                <geom pos="-0.01 0.004 -0.01"
+                                      quat="-0.5 0.5 0.5 0.5"
+                                      type="mesh" name="Pen_Holder"
+                                      mesh="Pen_Holder"
+                                      rgba="1 1 1 1"/>
+                                <geom pos="-0.0035 0.025 0.05"
+                                      quat="0 1 0 0"
+                                      type="mesh" name="Pen"
+                                      mesh="Pen"
+                                      rgba="0.5 0.5 0.5 1"/>
                             </body>
                         </body>
                     </body>
@@ -80,12 +131,12 @@
             </body>
         </body>
     </worldbody>
+
     <actuator>
         <position class="joint1" name="joint1" joint="joint1"/>
         <position class="joint2" name="joint2" joint="joint2"/>
         <position class="joint3" name="joint3" joint="joint3"/>
         <position class="joint4" name="joint4" joint="joint4"/>
         <position class="joint5" name="joint5" joint="joint5"/>
-        <!-- <position class="joint6" name="joint6" joint="joint6"/> -->
     </actuator>
 </mujoco>

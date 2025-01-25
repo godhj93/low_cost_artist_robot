@@ -1,51 +1,21 @@
 
-This folder provides an all-encompassing working structure for empirical papers.
 
-It organizes every step of the process: merging and cleaning (several) data sets, performing analyses (tables, figures, regressions), writing the paper and talks themselves, and submitting it to journals.
+## 1. Introduction
 
-**To use it**: follow the setup instructions below.
+This repository contains the code and data for the paper **"Demonstrating Artistic Drawing on Low-Cost Artist Robot"** presented at [RSS 2025](https://roboticsconference.org/). The paper discusses the development of a low-cost artist robot capable of drawing pictures on paper. The robot is built using ROS and MuJoCo and comprises a [Koch1.1](https://github.com/jess-moss/koch-v1-1) robot and a pen holder. It is controlled by a computer via ROS, enabling it to draw pictures by moving the pen holder.
 
-## Summary
-0. Workflow
-1. Requirements
-2. Setup
-3. Folders
-4. Files
-5. Leveraging on Github Capabilities
-6. Writing
-7. Journal Submissions
-8. Principles
-9. Further Reading
 
-## 0. Workflow
 
-![](extra/workflow.png)
 
-## 1. Requirements
+![system_overview](figures/system_overview.png)
 
-This workflow requires:
-- [Bash](https://www.gnu.org/software/bash/) [Free]
-- [Python](https://www.python.org) [Free] 
-- [LaTeX](https://www.latex-project.org) [Free]
-
-Other great languages and softwares may also be used.
-- [R](https://www.r-project.org) [Free]
-- [Stata](https://www.stata.com) [Licensed]
-- [Matlab](https://www.mathworks.com/products/matlab) [Licensed]
-
-For now it is only adapted for OSX (Apple) environments. But feel free to adapt it to Windows (and please share it with me!).
+[VIDEO DEMO]
 
 ## 2. Setup
 
-<!-- 
-1. Create or join a cloud folder (e.g. on Dropbox or Drive) where large non-versioned files will reside.
-2. Clone this repository to a local folder *outside* the cloud folder.
-3. Fill out the correct environment paths in `setup.sh`.
-4. Run `sh setup.sh` to create symbolic links to all non-versioned folders.
+### 2.1 Simulation Setup
 
-You're good to go. This repository is now ready for the standard workflow described below. -->
-
-We provide a Dockerfile to create an image with all the necessary tools to run the workflow. To build the image, run the following command:
+- We provide a Dockerfile to create an image with all the necessary tools to run the workflow. To build the image, run the following command:
 
 ```bash
 # To build the image
@@ -54,12 +24,12 @@ sh build.sh
 # To run the container
 sh run.sh
 ```
-When you successfully build the image and run the container, you will be inside the container as shown below:
+- When you successfully build the image and run the container, you will be inside the container as shown below:
 
 ![build_image](figures/build_image.png)
 ![run_container](figures/run_container.png)
 
-Since MuJoCo is used for simulating kocv1.1, we need GUI support. To run the container with GUI support, run the following command:
+- Since MuJoCo is used for simulating koch1.1, we need GUI support. To run the container with GUI support, run the following command:
 
 ```bash
 # In another terminal, run the following command
@@ -68,7 +38,7 @@ xhost +
 
 ![xhost](figures/enable_gui.png)
 
-When you successfully run the container, you can access ROS workspace as follows:
+- When you successfully run the container, you can access ROS workspace as follows:
 
 ```bash
 # To move to the workspace
@@ -81,7 +51,7 @@ catkin build
 source devel/setup.bash
 ```
 
-To run the simulation, run the following command:
+- To run the simulation, run the following command:
 
 ```bash
 # To fix link error to use CUDA, run the following command
@@ -90,140 +60,180 @@ ldconfig
 roslaunch lerobot simulation.launch
 ```
 
+- You can see the drawing result via RViz in real-time
+
+## Additional features
+We augmented [Whisper](https://openai.com/index/whisper/) model which can listen to the user's voice and convert it to text. If you have a microphone, you can use this feature!
+
+By default, we disabled this feature. To enable this feature, you can change the script as follows:
+
+```python3
+# In the "low_cost_artist_robot/lerobot_ws/src/lerobot/scripts/drawing_client.py"
+# Change the value of "MIC" to True (Line 22)
+MIC = True
+```
+
 ## 3. Real Robot Configuration
 
-TO BE IMPLEMENTED
-1. Kocv description
-2. Pen holder description
-3. How to assemble the robot
-4. How to connect the robot to the computer
-5. How to run the robot
+We adopted the Koch1.1 robot as the base robot for our low-cost artist robot. The Koch1.1 robot is a 6-DOF robot arm with a 3D-printed structure and Dynamixel XL-330 and XL-430 actuators. The assembly of the robot is straightforward. Details on the assembly and connection of the robot to the computer are provided in the following repository: [Koch1.1](https://github.com/jess-moss/koch-v1-1). You have to see **"the follower arm"** part in the repository to assemble the robot. This [video](https://www.youtube.com/watch?v=8nQIg9BwwTk&ab_channel=HuggingFace) will help you to assemble the robot.
 
-## 3. Folders
+### Pen and Pen Holder Design
 
-##### `/code`
+We designed a pen holder specifically for the Koch1.1 robot, enabling precise movement of a pen in the x, y, and z directions. The pen holder was modeled in SolidWorks and fabricated using 3D printing technology. It is securely mounted to the Koch1.1 robot using screws, ensuring stability during operation. In our study, we utilized four actuators to control the pen, with an additional servo included to support further development and enhanced functionality.
 
-- Versioned folder containing code that builds data and performs analyses.
-- All output data should be redirected into `/output/data/`, with one data file per observation level.
-- All output logs should be redirected into `/output/logs/`.
-- Other output files should be redirected into `/output/tables/` or `/output/figures/`.
-- Keep all code clean and modularized.
+The 3D model of the pen holder is provided in the **3D_Models** directory. It is available in both STL and SLDPRT formats, ensuring compatibility with SolidWorks. Additionally, the directory contains a 3D model of a compatible pen, also provided in STL and SLDPRT formats, making it easy to integrate and use with SolidWorks for your projects.
 
-    `/sub`
-    - Holds modularized code to implement subroutines for build and analysis code.
-  
-##### `/input`
+<p align="center">
+  <img src="figures/pen_holder.png" alt="Pen Holder" width="300" height="300">
+  <img src="figures/pen.png" alt="Pen" width="300" height="300">
+  <img src="figures/assembly.png" alt="Assembly" width="300" height="300">
+</p>
 
-- Symbolic link to non-versioned folder with input data.
-- Any original data source should be included here in clean and normalized form.
-- Only include cleaned files. Raw external files should be cleaned in each data source specific folder.
-- These data sets will then be manipulated and merged by the files in `/code`.
-  
-##### `/output`
+You can modify the robot description for your specific pen holder design by editing the **"low_cost_artist_robot/lerobot_ws/src/lerobot/scripts/low_cost_robot/low_cost_robot.xml"** file.
 
-- Symbolic link to non-versioned folder with output data.
-- Holds built data sets in `/output/data/`, to be then used in analysis code.
-- Contains all analysis objects generated by files in `/code`.
-- Will then serve as source for the generation of `.tex` files inside `/products/`.
+In the file, you can adjust the following parameters to match your pen holder design:
+```xml
+      <joint name="joint5" class="joint5"/>
+                                <geom pos="-0.01 0.004 -0.01"
+                                      quat="-0.5 0.5 0.5 0.5"
+                                      type="mesh" name="Pen_Holder"
+                                      mesh="Pen_Holder"
+                                      rgba="1 1 1 1"/>
+                                <geom pos="-0.0035 0.025 0.05"
+                                      quat="0 1 0 0"
+                                      type="mesh" name="Pen"
+                                      mesh="Pen"
+                                      rgba="0.5 0.5 0.5 1"/>
+```
+Here, you can adjust the position and orientation of the pen holder and pen to match your design. Additionally, The filepath must be updated to reflect the location of your STL files in the same file.
 
-##### `/tmp`
+```xml
+    <asset>
+        <mesh file="/root/low_cost_artist_robot/lerobot_ws/src/lerobot/scripts/low_cost_robot/assets/STL/Follower_Base.stl" scale="0.001 0.001 0.001"/>
+        <mesh file="/root/low_cost_artist_robot/lerobot_ws/src/lerobot/scripts/low_cost_robot/assets/STL/Follower_Shoulder_Rotation.stl" scale="0.001 0.001 0.001"/>
+        <mesh file="/root/low_cost_artist_robot/lerobot_ws/src/lerobot/scripts/low_cost_robot/assets/STL/Follower_Shoulder_To_Elbow.stl" scale="0.001 0.001 0.001"/>
+        <mesh file="/root/low_cost_artist_robot/lerobot_ws/src/lerobot/scripts/low_cost_robot/assets/STL/Follower_Elbow_To_Wrist_Extension.stl" scale="0.001 0.001 0.001"/>
+        <mesh file="/root/low_cost_artist_robot/lerobot_ws/src/lerobot/scripts/low_cost_robot/assets/STL/Follower_Elbow_To_Wrist.stl" scale="0.001 0.001 0.001"/>
+        <mesh file="/root/low_cost_artist_robot/lerobot_ws/src/lerobot/scripts/low_cost_robot/assets/STL/Pen_Holder.stl" scale="0.001 0.001 0.001"/>
+        <mesh file="/root/low_cost_artist_robot/lerobot_ws/src/lerobot/scripts/low_cost_robot/assets/STL/Pen.stl" scale="0.001 0.001 0.001"/>
+        <mesh file="/root/low_cost_artist_robot/lerobot_ws/src/lerobot/scripts/low_cost_robot/assets/STL/XL-330.stl" scale="0.001 0.001 0.001"/>
+        <mesh file="/root/low_cost_artist_robot/lerobot_ws/src/lerobot/scripts/low_cost_robot/assets/STL/XL-430.stl" scale="0.001 0.001 0.001"/>
+    </asset>
+```
 
-- Symbolic link to non-versioned folder with temporary files.
-- Contains any temporary file created during the manipulation of input data sets or the analysis routine.
+### Whiteboard
 
-##### `/extra`
+To simulate the drawing process on the whiteboard, you can use the **"low_cost_artist_robot/lerobot_ws/src/lerobot/scripts/low_cost_robot/scene.xml"** file. The size of the whiteboard can be adjusted by modifying the size parameter within the file. Additionally, it is essential to specify the friction parameter to ensure the simulation aligns with your specific requirements.
 
-- Contains any extra file relevant to the paper.
-- Examples: grant materials, previous analyses, submissions.
+```xml
+	
+    <body name="white_board" pos="-0.05 0.2 0.01">
+        <inertial pos="0 0 0" mass="0.1" diaginertia="0.00016667 0.00016667 0.00016667"/>
+        <geom friction="0.2 0.01 0.001" condim="3" pos="0.08 0.15 0" size="0.2 0.2 0.001" type="box" name="white_board" rgba="1 1 1 1" priority="1"/>
+    </body>
 
-##### `/products`
+```
 
-- Versioned folder containing files for preliminary results, papers, talks, and others.
 
-    `/sub`
-    - Curated set of packages and shortcuts commonly used in Social Science papers and presentations.
-## 4. Files
+# 4. Recording your own drawing
+When you try to record your own drawing in the simulation, you can refer the following script:
 
-##### `run_paper.py`
+```python
+# In the "low_cost_artist_robot/lerobot_ws/src/lerobot/scripts/drawing_server.py"
 
-- Automates the whole paper construction.
-- Runs everything in a pre-specified order, from beginning (building data sets) to end (compiling `.tex` files).
-- Keeps clear what should be run when.
-- Also cleans `/output` and `/tmp` folders before running other code.
+# Line 35-69
+import enum
 
-##### `/code/get_input.py`
+class Resolution(enum.Enum):
+  SD = (480, 640)
+  HD = (720, 1280)
+  UHD = (2160, 3840)
 
-- Erases any file inside `/input` and copies any original data set from outside sources.
-- Ensures consistency across original data generation and data building for paper.
 
-## 5. Leveraging on Github capabilities
+def quartic(t: float) -> float:
+  return 0 if abs(t) > 1 else (1 - t**2) ** 2
 
-- Use issues as tasks. Track it all on a project board named "Tasks".
-	- Add tags to tasks to track progress by area. Some template tags included: `build`, `analysis`, `writing`, `review`, `enhancement`, `bug`.
-- Name commits following [conventional notation](https://www.conventionalcommits.org).
-- Add forward-looking tags and milestones to plan and version work.
-	- These help marking relevant releases, such as a minimum viable product (MVP), a paper submission, or a talk.
-	- Use [semantic versioning](https://semver.org/) for naming, e.g. `v0.1`, `v1.0.2`.
-- Only modify files via pull requests. Use closing keywords to close issues.
 
-## 6. Writing
+def blend_coef(t: float, duration: float, std: float) -> float:
+  normalised_time = 2 * t / duration - 1
+  return quartic(normalised_time / std)
 
-All writing should be done within the repository to preserve versioning and consistency.
 
-- Keep a set of continuously-updated slides reflecting the current state and vision of the project.
-- Sync this repository with online LaTeX editing tools, such as [Overleaf](https://www.overleaf.com/), for simultaneous editing and comments.
-	- Follow these instructions to [integrate Overleaf with Dropbox](https://www.overleaf.com/learn/how-to/Dropbox_Synchronization).
-	- Sync Overleaf project to a folder `/products/paper`.
-	- **Important**: the project's "true" state stays in Github. Thus, things always have to be committed on Github after edits.
-- Keep all `.bib` references organized in `/extra/references/library.bib`. See principle about reference manager systems below.
+def unit_smooth(normalised_time: float) -> float:
+  return 1 - np.cos(normalised_time * 2 * np.pi)
 
-## 7. Journal Submissions
 
-Use this folder and Github for working on reviewing drafts (e.g. after a Revise and Resubmit request).
+def azimuth(
+    time: float, duration: float, total_rotation: float, offset: float
+) -> float:
+  return offset + unit_smooth(time / duration) * total_rotation
 
-Flow:
-1. Centralize all numbered comments in one document uploaded to `/extra/submissions/journal/comments.txt`.
-2. Assign comments to issues with clear tasks described in text. Assign issues to people, add tags, add milestone for "journal resubmission", etc. Add issue numbers below each review comment so that it can be tracked 1:1.
-3. Work on issues, add sentences/paragraphs together with commit messages describing changes made to code and writing.
-4. As issues start to be closed via PRs, put together a 'release' text, which will feed into letter to the editor and referees.
-5. When all is done, set a tag for the release and send it off for the journal.
+res = Resolution.SD
+fps = 60
+duration = 1000.0
+ctrl_rate = 2
+ctrl_std = 0.05
+total_rot = 180
+blend_std = .8
 
-Use tags: `review`, `build`, `analysis`, `writing`, `negative replies`.
+# Line 110-134
+## Camera
+global res, fps
+h, w = res.value
+world.vis.global_.offheight = h
+world.vis.global_.offwidth = w
+renderer = mujoco.Renderer(world, height=h, width=w)
 
-## 8. Principles
+np.random.seed(12345)
 
-- For each new project, start (i) a structured versioned folder, (ii) a task manager project, and (iii) a set of slides.
-	1. Copy this folder and use a version control system (e.g. [Git](https://git-scm.com/)).
-		* Keep track of multiple authors' edits.
-		* No more `report_final_v3.2b_ST_toDelete.tex`.
-		* Use branching to work simultaneously on code.
-	2. Use Github's issues and projects as a task management system. (For other tools, see [ClickUp](https://clickup.com/), [2Do](https://www.2doapp.com/), [Asana](https://asana.com), [Trello](https://trello.com/), and [JIRA](https://www.atlassian.com/software/jira)).
-		* Your email inbox is not a task manager.
-		* Tasks should be actionable atoms.
-		* Set priorities, assignments, due dates, etc.
-		* Only one person should be ultimately responsible for each task.
-		* Do regular reviews and cleaning.
-	3. Slides
-		* Containing the current (summarized) version of the paper.
-		* Update it continuously. It will discipline your work.
-- Keep two folders: `/papers`, and `/data`, as shown in the workflow.
-	1. Data.
-		* Each folder within `/data` is a data set.
-		* Use the same structure for cleaning these datasets (e.g. `/code`, `/input`, `/output`, `/tmp`)
-	2. Papers.
-		* Each folder within `/papers` is paper.
-		* Use `/main_paper/code/get_input.py` to copy original datasets.
-- Use a good text editor (I recommend [Visual Studio Code](https://code.visualstudio.com/), [Sublime Text](https://www.sublimetext.com/), [Notepad ++](https://notepad-plus-plus.org/), or [vim](http://www.vim.org/)).
-- Use a modern and flexible communication tool (see [Discord](https://discord.com/) or [Slack](https://slack.com)).
-- Use a good reference/citation manager (I recommend [Mendeley](https://www.mendeley.com)). Let Mendeley (1) watch a downloads folder, (2) automatically organize every paper into a separate maintained folder in the cloud (Dropbox, Google Drive, etc.), and (3) keep a .bib file with all formatted citations in a `/references` folder. Let each paper be named "Author - Year - Title" (so you can search for PDFs efficiently). If you have a tablet to read and annotate papers, sync your reader (I recommend [PDF Expert](https://pdfexpert.com/)) to this folder. This way, all your annotations will automatically remain synced with Mendeley.
-- Keep documentation lean and clean.
-- Keep this folder organized. Your future self thanks your present effort.
+# Rendering options for visual and collision geoms.
+vis = mujoco.MjvOption()
+vis.geomgroup[2] = True
+vis.geomgroup[3] = False
+coll = mujoco.MjvOption()
+coll.geomgroup[2] = False
+coll.geomgroup[3] = True
+coll.flags[mujoco.mjtVisFlag.mjVIS_CONVEXHULL] = True
 
-## 9. Further Reading
+# Create a camera that will revolve around the robot.
+camera = mujoco.MjvCamera()
+mujoco.mjv_defaultFreeCamera(world, camera)
+camera.distance = 0.5
+offset = world.vis.global_.azimuth
+frames = []
+##
 
-- [Gentzkow & Shapiro (2014) Code and Data for the Social Sciences](https://web.stanford.edu/~gentzkow/research/CodeAndData.pdf)
-- [Julian Reif's Stata Coding Guide](https://reifjulian.github.io/guide)
-- [Michael Stepner's Coding Style Guide](https://github.com/michaelstepner/healthinequality-code/blob/master/code/readme.md)
-- [Gentzkow & Shapiro Lab's Paper Template](https://github.com/gslab-econ/template)
-- [Tutorial on how to combine Git and Dropbox](https://github.com/kbjarkefur/GitHubDropBox)
-- [Guidelines on how to name git commits](https://www.conventionalcommits.org)
+# Line 153-170
+## Camera 
+            
+if len(frames) < data.time * fps:
+	
+	target_body_name = "link5"  # Object name to look at
+	target_body_id = mujoco.mj_name2id(world, mujoco.mjtObj.mjOBJ_BODY, target_body_name)
+
+	camera.lookat[:] = data.xpos[target_body_id]
+	
+	camera.azimuth = azimuth(data.time, duration, total_rot, offset)
+	renderer.update_scene(data, camera, scene_option=vis)
+	vispix = renderer.render().copy().astype(np.float32)
+	renderer.update_scene(data, camera, scene_option=coll)
+	collpix = renderer.render().copy().astype(np.float32)
+	b = blend_coef(data.time, duration, blend_std)
+	frame = (1 - b) * vispix + b * collpix
+	frame = frame.astype(np.uint8)
+	frames.append(frame)
+```
+
+You can modify the above script to record your own drawing in the simulation. You can adjust the resolution, frame rate, duration, and other parameters to match your specific requirements. Additionally, you can modify the camera settings to capture the drawing process from different angles and perspectives.
+
+For the drawing result, you can use RViz to visualize the drawing process in real-time by running the following command:
+
+```bash
+rosbag record -a -O drawing_result.bag
+```
+
+You can replay the recorded bag file using the following command:
+
+```bash
+rosbag play drawing_result.bag
+```

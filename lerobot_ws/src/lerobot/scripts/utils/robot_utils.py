@@ -12,18 +12,18 @@ from robot import Robot
 from interface import SimulatedRobot
 from geometry_msgs.msg import Point
 
-def visualize_in_rviz(robot, end_point_traj, end_point_traj_pub):
-    
-    ee_pos = robot.read_ee_pos(joint_name='joint5')
+def visualize_in_rviz(robot, points, end_point_traj, end_point_traj_pub):
     
     pts = Point()
     
-    pts.x = ee_pos[0]
-    pts.y = ee_pos[1]
-    pts.z = ee_pos[2]
+    pts.x = points[0]
+    pts.y = points[1]
+    pts.z = points[2]
 
     end_point_traj.points.append(pts)
     end_point_traj_pub.publish(end_point_traj)
+    
+    return pts.x, pts.y, pts.z
     
 def initialize_simulator(Hz = 100.0): 
     world, data = load_world()
@@ -68,7 +68,7 @@ def fix_joint_angle():
     rot = calculate_target_rotation()
     return rot.flatten()
 
-def create_marker_traj(ns = "joint6_trajectory"):
+def create_marker_traj(ns = "joint6_trajectory", color='green'):
     
     trajectory_marker = Marker()
     trajectory_marker.header.frame_id = "world"  # Replace with your Fixed Frame
@@ -81,13 +81,18 @@ def create_marker_traj(ns = "joint6_trajectory"):
     trajectory_marker.scale.y = 0.001  # Line width
     trajectory_marker.scale.z = 0.001  # Line width
     trajectory_marker.color.a = 1.0  # Transparency
-    trajectory_marker.color.r = 1.0  # Red
-    trajectory_marker.color.g = 0.0
-    trajectory_marker.color.b = 0.0
+    if color == 'green':
+        trajectory_marker.color.r = 0.0  
+        trajectory_marker.color.g = 1.0
+        trajectory_marker.color.b = 0.0
+    elif color == 'white':
+        trajectory_marker.color.r = 1.0
+        trajectory_marker.color.g = 1.0
+        trajectory_marker.color.b = 1.0
+        
     trajectory_marker.pose.orientation.w = 1.0
     
     return trajectory_marker
-    
 
 def degree2pwm(degree: np.ndarray) -> np.ndarray:
   '''
@@ -144,8 +149,6 @@ def initialize_real_robot(world, device_name):
     robot_real = Robot(device_name=device_name)
     print(colored("Real Robot Connected!", 'green'))
 
-    # m = mujoco.MjModel.from_xml_path('low_cost_robot/scene.xml')
-
     # Set the robot to initial position
     robot_real._set_position_control()
     robot_real._enable_torque()
@@ -161,6 +164,5 @@ def initialize_real_robot(world, device_name):
         step_start = clock(step_start, world)
 
     print(colored(f"robot_real is initialized to {pwm2radian(init_pos)}, current position: {pwm2radian(robot_real.read_position())}", 'green'))
-    # robot_real._disable_torque()
     
     return robot_real
