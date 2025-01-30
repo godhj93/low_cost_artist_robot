@@ -9,7 +9,8 @@ This repository contains the code and data for the paper **"Demonstrating Artist
 
 ![system_overview](figures/system_overview.png)
 
-[VIDEO DEMO]
+<iframe width="560" height="315" src="https://youtu.be/SALlcuBjAEM?si=qWEkAV9Z758cFgON" frameborder="0" allowfullscreen></iframe>
+
 
 ## 2. Setup
 
