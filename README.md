@@ -9,7 +9,7 @@ This repository contains the code and data for the paper **"Demonstrating Artist
 
 ![system_overview](figures/system_overview.png)
 
-### [Demo Video](https://youtu.be/SALlcuBjAEM)
+### [Demo Video](https://youtu.be/L9TqBFdDH68?si=as7xFOPdBShXHnl0)
 
 ## 2. Setup
 
@@ -56,6 +56,9 @@ To run the simulation, run the following command:
 ldconfig
 # To run the low cost artist robot in the simulation
 roslaunch lerobot simulation.launch
+
+# To run the real robot, run the following command
+roslaunch lerobot real_bot.launch
 ```
 
 - You can see the drawing result via RViz in real-time
