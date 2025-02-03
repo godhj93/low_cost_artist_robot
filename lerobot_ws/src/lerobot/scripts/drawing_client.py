@@ -192,7 +192,7 @@ if __name__ == "__main__":
                 rospy.loginfo("Recording again.")
                 
         else:
-            prompt = "a cute cat" 
+            prompt = "a tree with a single trunk and a sparse canopy of leaves" 
             rospy.loginfo(f"Prompt: {prompt}")
         
         threshold_image, threshold_image_name = stroke_func.prompt_to_line_art_img(prompt, filename, pipeline_text2image)
@@ -245,5 +245,11 @@ if __name__ == "__main__":
                     if rospy.is_shutdown():
                         break
                     
+                
+                    
         except rospy.ServiceException as e:
             rospy.logerr(f"Service call failed: {e}")
+            
+        finally:
+            rospy.loginfo("Drawing request completed.")
+            break
