@@ -119,7 +119,7 @@
                                       type="mesh" name="Pen_Holder"
                                       mesh="Pen_Holder"
                                       rgba="1 1 1 1"/>
-                                <geom pos="-0.0035 0.025 0.05"
+                                <geom pos="-0.0035 0.025 0.08"
                                       quat="0 1 0 0"
                                       type="mesh" name="Pen"
                                       mesh="Pen"

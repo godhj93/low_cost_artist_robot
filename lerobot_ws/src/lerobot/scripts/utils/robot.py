@@ -2,10 +2,10 @@
 import numpy as np
 from dynamixel import Dynamixel, OperatingMode, ReadAttribute
 import time
-from dynamixel_sdk import GroupSyncRead, GroupSyncWrite, DXL_LOBYTE, DXL_HIBYTE, DXL_LOWORD, DXL_HIWORD
+# from dynamixel_sdk import GroupSyncRead, GroupSyncWrite, DXL_LOBYTE, DXL_HIBYTE, DXL_LOWORD, DXL_HIWORD
+from dynamixel_sdk import *
 from enum import Enum, auto
 from typing import Union
-
 
 class MotorControlType(Enum):
     PWM = auto()
@@ -13,6 +13,7 @@ class MotorControlType(Enum):
     VELOCITY_CONTROL = auto()
     DISABLED = auto()
     UNKNOWN = auto()
+
 
 
 class Robot:
@@ -67,8 +68,42 @@ class Robot:
         for id in self.servo_ids:
             self.vel_writer.addParam(id, [2048])
 
+        # for id in self.servo_ids:
+        #     # if id == 2:
+        #     #     self.set_pid_gain(id, 1000, 100, 0)
+        #     #     self.read_gain(id, 84, "P")
+        #     #     self.read_gain(id, 82, "I")
+        #     #     self.read_gain(id, 80, "D")
+        #     if id == 3: 
+        #         self.set_pid_gain(id, 1000, 100, 600)
+        #         self.read_gain(id, 84, "P")
+        #         self.read_gain(id, 82, "I")
+        #         self.read_gain(id, 80, "D")
+        #     if id == 4: 
+        #         self.set_pid_gain(id, 1000, 100, 600)
+        #         self.read_gain(id, 84, "P")
+        #         self.read_gain(id, 82, "I")
+        #         self.read_gain(id, 80, "D")
+
         self._disable_torque()
         self.motor_control_state = MotorControlType.DISABLED
+
+        # for id in self.servo_ids:
+        #     # if id == 2:
+        #     #     self.set_pid_gain(id, 1000, 100, 0)
+        #     #     self.read_gain(id, 84, "P")
+        #     #     self.read_gain(id, 82, "I")
+        #     #     self.read_gain(id, 80, "D")
+        #     if id == 3: 
+        #         print("HERE")
+        #         self.read_gain(id, 84, "P")
+        #         self.read_gain(id, 82, "I")
+        #         self.read_gain(id, 80, "D")
+        #     if id == 4: 
+        #         print("HERE2")
+        #         self.read_gain(id, 84, "P")
+        #         self.read_gain(id, 82, "I")
+        #         self.read_gain(id, 80, "D")
 
     def read_position(self, tries=5):
         """
@@ -192,6 +227,46 @@ class Robot:
             self.dynamixel.set_pwm_limit(motor_id, limit)
         self._enable_torque()
 
+    def set_pid_gain(self, dxl_id, p_gain, i_gain, d_gain):
+        # P 게인 설정
+        dxl_comm_result, dxl_error = self.dynamixel.packetHandler.write2ByteTxRx(
+            self.dynamixel.portHandler, dxl_id, 84, p_gain
+        )
+        if dxl_comm_result != COMM_SUCCESS:
+            print(f"Failed to set P Gain: {self.dynamixel.packetHandler.getTxRxResult(dxl_comm_result)}")
+        elif dxl_error != 0:
+            print(f"Error occurred: {self.dynamixel.packetHandler.getRxPacketError(dxl_error)}")
+        
+        # I 게인 설정
+        dxl_comm_result, dxl_error = self.dynamixel.packetHandler.write2ByteTxRx(
+            self.dynamixel.portHandler, dxl_id, 82, i_gain
+        )
+        if dxl_comm_result != COMM_SUCCESS:
+            print(f"Failed to set I Gain: {self.dynamixel.packetHandler.getTxRxResult(dxl_comm_result)}")
+        elif dxl_error != 0:
+            print(f"Error occurred: {self.dynamixel.packetHandler.getRxPacketError(dxl_error)}")
+
+        # D 게인 설정
+        dxl_comm_result, dxl_error = self.dynamixel.packetHandler.write2ByteTxRx(
+            self.dynamixel.portHandler, dxl_id, 80, d_gain
+        )
+        if dxl_comm_result != COMM_SUCCESS:
+            print(f"Failed to set D Gain: {self.dynamixel.packetHandler.getTxRxResult(dxl_comm_result)}")
+        elif dxl_error != 0:
+            print(f"Error occurred: {self.dynamixel.packetHandler.getRxPacketError(dxl_error)}")
+            
+    def read_gain(self, dxl_id, address, name):
+        dxl_gain, dxl_comm_result, dxl_error = self.dynamixel.packetHandler.read2ByteTxRx(
+            self.dynamixel.portHandler, dxl_id, address
+        )
+        if dxl_comm_result != COMM_SUCCESS:
+            print(f"Failed to read {name} Gain: {self.dynamixel.packetHandler.getTxRxResult(dxl_comm_result)}")
+        elif dxl_error != 0:
+            print(f"Error occurred while reading {name} Gain: {self.dynamixel.packetHandler.getRxPacketError(dxl_error)}")
+        else:
+            print(f"{name} Gain read successfully: {dxl_gain}")
+        return dxl_gain
+
     def _disable_torque(self):
         print(f'disabling torque for servos {self.servo_ids}')
         for motor_id in self.servo_ids:
@@ -226,7 +301,7 @@ class Robot:
             self.dynamixel.set_operating_mode(motor_id, OperatingMode.VELOCITY)
         # self._enable_torque()
         self.motor_control_state = MotorControlType.VELOCITY_CONTROL
-
+        
 if __name__ == "__main__":
     robot = Robot(device_name='/dev/ttyACM0')
     robot._disable_torque()
