@@ -29,7 +29,7 @@ def numpy_to_point_array(pts):
 
 def filter_out(data):
     
-    data = pd.read_csv(file_path)   
+    # data = pd.read_csv(file_path)   
             
     # t_pts = filter_out(data)
     # Interpolartion
@@ -46,6 +46,10 @@ def filter_out(data):
     
     pts = data.iloc[:, :3].values
     
+    return pts
+
+def transform(pts):
+
     t_pts = transform_to_configuration_space(pts)
     
     target_queue = Queue()
@@ -159,12 +163,12 @@ if __name__ == "__main__":
         listener = whisper.load_model("base")
     
     rospy.loginfo("Loading Stable Diffusion model...")
-    pipeline_text2image = AutoPipelineForText2Image.from_pretrained(
-        "stabilityai/stable-diffusion-2-1-base",  #
-        torch_dtype=torch.float16,
-        variant="fp16",
-        use_safetensors=True
-    ).to("cuda")
+    # pipeline_text2image = AutoPipelineForText2Image.from_pretrained(
+    #     "stabilityai/stable-diffusion-2-1-base",  #
+    #     torch_dtype=torch.float16,
+    #     variant="fp16",
+    #     use_safetensors=True
+    # ).to("cuda")
     
     rospy.loginfo("Ready to listen.")
     
@@ -195,19 +199,19 @@ if __name__ == "__main__":
             prompt = "a tree with a single trunk and a sparse canopy of leaves" 
             rospy.loginfo(f"Prompt: {prompt}")
         
-        threshold_image, threshold_image_name = stroke_func.prompt_to_line_art_img(prompt, filename, pipeline_text2image)
-        stroke_list = stroke_func.img_to_svg_to_stroke(filename, threshold_image_name)
+        # threshold_image, threshold_image_name = stroke_func.prompt_to_line_art_img(prompt, filename, pipeline_text2image)
+        # stroke_list = stroke_func.img_to_svg_to_stroke(filename, threshold_image_name)
         
-        output_dir = "drawing_data"
-        output_dir = os.path.join(os.path.dirname(script_path), output_dir)
+        # output_dir = "drawing_data"
+        # output_dir = os.path.join(os.path.dirname(script_path), output_dir)
         
-        if not os.path.exists(output_dir):
-            os.makedirs(output_dir, exist_ok=True)
+        # if not os.path.exists(output_dir):
+        #     os.makedirs(output_dir, exist_ok=True)
             
-        csv_filename = f"refined_{filename}"
-        path_to_save = os.path.join(output_dir, csv_filename)
-        refine_stroke_and_to_csv(path_to_save, stroke_list=stroke_list)
-        rospy.loginfo(f"Stroke data saved to {path_to_save}.")
+        # csv_filename = f"refined_{filename}"
+        # path_to_save = os.path.join(output_dir, csv_filename)
+        # refine_stroke_and_to_csv(path_to_save, stroke_list=stroke_list)
+        # rospy.loginfo(f"Stroke data saved to {path_to_save}.")
         
         try:
             # Create the service proxy
@@ -221,10 +225,72 @@ if __name__ == "__main__":
             
             # Process each file
             for file_path in csv_files:
-                data = pd.read_csv(file_path)
                 
-                transformed_pts = filter_out(data)
+                data = pd.read_csv(file_path)               
+                
+                filtered_data = filter_out(data)
+                
+                print(filtered_data)
+                # Cluster
+                clusters = []         # Will store tuples: (order, x, y, cluster_id)
+                current_cluster = []  # Temporary list for the current cluster's points
+                cluster_id = 0
+                order_index = 0       # Overall order index
 
+                # Iterate through each row of the CSV to form clusters.
+                for idx, row in enumerate(filtered_data):
+                    # row[0]: x, row[1]: y, row[2]: z
+                    current_cluster.append((order_index, row[0], row[1]))
+                    order_index += 1
+                    if row[2] == 1:  # z==1 은 현재 클러스터의 끝을 나타냅니다.
+                        for point in current_cluster:
+                            clusters.append((point[0], point[1], point[2], cluster_id))
+                        current_cluster = []  # 다음 클러스터를 위해 초기화.
+                        cluster_id += 1
+
+                # 클러스터 데이터프레임 생성
+                clustered_df = pd.DataFrame(clusters, columns=['order', 'x', 'y', 'cluster'])
+                
+                # 각 클러스터의 시작점과 끝점 계산.
+                cluster_info = clustered_df.groupby('cluster').agg(
+                    start_order=('order', 'min'),
+                    start_x=('x', 'first'),
+                    start_y=('y', 'first'),
+                    end_order=('order', 'max'),
+                    end_x=('x', 'last'),
+                    end_y=('y', 'last')
+                ).reset_index()
+
+
+                print(cluster_info)
+                print("?")
+                from utils.trajectory_optimization import nearest_neighbor_tsp_clusters, total_distance
+                # Get the TSP visitation order for clusters (starting from cluster 0).
+                
+                tsp_order = nearest_neighbor_tsp_clusters(cluster_info, start_cluster=0)
+                print("TSP Cluster visitation order (by cluster index):", tsp_order)
+                
+                # 4. Reorder the waypoints based on the TSP cluster visitation order.
+                #    Within each cluster, preserve the original order of points.
+                sorted_waypoints = pd.DataFrame(columns=clustered_df.columns)
+                for cid in tsp_order:
+                    cluster_points = clustered_df[clustered_df['cluster'] == cid].sort_values(by='order')
+                    sorted_waypoints = pd.concat([sorted_waypoints, cluster_points], ignore_index=True)
+                sorted_waypoints.reset_index(drop=True, inplace=True)
+                
+                print(sorted_waypoints)
+                print("Done")
+                
+                original_order_df = clustered_df.sort_values(by='order').reset_index(drop=True)
+                distance_original = total_distance(original_order_df)
+                distance_optimized = total_distance(sorted_waypoints)
+                print("Total travel distance (original order):", distance_original)
+                print("Total travel distance (optimized order):", distance_optimized)
+                improvement = (distance_original - distance_optimized) / distance_original * 100
+                print("Gained improvement (%)", improvement)
+                
+                
+                transformed_pts = transform(filtered_data)
                 # Convert to Point[] message
                 points_msg = numpy_to_point_array(transformed_pts)
 
@@ -245,9 +311,7 @@ if __name__ == "__main__":
                     if rospy.is_shutdown():
                         break
                     
-                
-                    
-        except rospy.ServiceException as e:
+        except Exception as e:
             rospy.logerr(f"Service call failed: {e}")
             
         finally:
