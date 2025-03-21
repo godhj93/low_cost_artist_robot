@@ -20,6 +20,7 @@ def nearest_neighbor_tsp_clusters(cluster_info_df, start_cluster=0):
     while len(route) < n:
         current_end_x = cluster_info_df.loc[current, 'end_x']
         current_end_y = cluster_info_df.loc[current, 'end_y']
+        
         next_cluster = None
         min_dist = float('inf')
         for i in range(n):

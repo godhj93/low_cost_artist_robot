@@ -10,7 +10,7 @@ import os, sys, torch, tempfile, whisper, subprocess, pyaudio, wave
 from diffusers import AutoPipelineForText2Image
 from gtts import gTTS
 from queue import Queue
-
+import time
 # Add the path to the transform module
 sys.path.append(os.path.join(os.path.dirname(__file__)))
 from utils.transform import transform_to_configuration_space
@@ -298,6 +298,7 @@ if __name__ == "__main__":
                 rospy.loginfo("Sending points to the drawing server.")
                 
                 # Call the service
+                start = time.time() 
                 response = drawing_service(points_msg)
                 
                 if response.success:
@@ -308,7 +309,8 @@ if __name__ == "__main__":
                 while not complete_service().success:
                     # rospy.loginfo("Waiting for the drawing server to complete the task.")
                     rospy.sleep(1)
-                    
+                    duration = time.time() - start 
+                    rospy.loginfo(f"Service call took {duration} seconds.")
                     if rospy.is_shutdown():
                         break
                     
