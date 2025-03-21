@@ -230,7 +230,6 @@ if __name__ == "__main__":
                 
                 filtered_data = filter_out(data)
                 
-                print(filtered_data)
                 # Cluster
                 clusters = []         # Will store tuples: (order, x, y, cluster_id)
                 current_cluster = []  # Temporary list for the current cluster's points
@@ -240,35 +239,34 @@ if __name__ == "__main__":
                 # Iterate through each row of the CSV to form clusters.
                 for idx, row in enumerate(filtered_data):
                     # row[0]: x, row[1]: y, row[2]: z
-                    current_cluster.append((order_index, row[0], row[1]))
+                    current_cluster.append((order_index, row[0], row[1], row[2]))
                     order_index += 1
                     if row[2] == 1:  # z==1 은 현재 클러스터의 끝을 나타냅니다.
                         for point in current_cluster:
-                            clusters.append((point[0], point[1], point[2], cluster_id))
+                            clusters.append((point[0], point[1], point[2], point[3], cluster_id))
                         current_cluster = []  # 다음 클러스터를 위해 초기화.
                         cluster_id += 1
 
                 # 클러스터 데이터프레임 생성
-                clustered_df = pd.DataFrame(clusters, columns=['order', 'x', 'y', 'cluster'])
+                clustered_df = pd.DataFrame(clusters, columns=['order', 'x', 'y', 'z', 'cluster'])
                 
                 # 각 클러스터의 시작점과 끝점 계산.
                 cluster_info = clustered_df.groupby('cluster').agg(
                     start_order=('order', 'min'),
                     start_x=('x', 'first'),
                     start_y=('y', 'first'),
+                    start_z=('z', 'first'),
                     end_order=('order', 'max'),
                     end_x=('x', 'last'),
-                    end_y=('y', 'last')
+                    end_y=('y', 'last'),
+                    end_z=('z', 'last') 
                 ).reset_index()
 
-
-                print(cluster_info)
-                print("?")
+                # Check 'z' unique values
                 from utils.trajectory_optimization import nearest_neighbor_tsp_clusters, total_distance
                 # Get the TSP visitation order for clusters (starting from cluster 0).
                 
                 tsp_order = nearest_neighbor_tsp_clusters(cluster_info, start_cluster=0)
-                print("TSP Cluster visitation order (by cluster index):", tsp_order)
                 
                 # 4. Reorder the waypoints based on the TSP cluster visitation order.
                 #    Within each cluster, preserve the original order of points.
@@ -278,8 +276,6 @@ if __name__ == "__main__":
                     sorted_waypoints = pd.concat([sorted_waypoints, cluster_points], ignore_index=True)
                 sorted_waypoints.reset_index(drop=True, inplace=True)
                 
-                print(sorted_waypoints)
-                print("Done")
                 
                 original_order_df = clustered_df.sort_values(by='order').reset_index(drop=True)
                 distance_original = total_distance(original_order_df)
@@ -289,8 +285,13 @@ if __name__ == "__main__":
                 improvement = (distance_original - distance_optimized) / distance_original * 100
                 print("Gained improvement (%)", improvement)
                 
+                print(filtered_data)
+                print(sorted_waypoints)
                 
-                transformed_pts = transform(filtered_data)
+                transformed_pts = transform(sorted_waypoints[['x', 'y', 'z']].to_numpy())
+                # transformed_pts = transform(filtered_data)  
+                
+                print(transformed_pts)
                 # Convert to Point[] message
                 points_msg = numpy_to_point_array(transformed_pts)
 
