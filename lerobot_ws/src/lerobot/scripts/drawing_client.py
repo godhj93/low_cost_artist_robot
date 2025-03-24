@@ -163,12 +163,12 @@ if __name__ == "__main__":
         listener = whisper.load_model("base")
     
     rospy.loginfo("Loading Stable Diffusion model...")
-    # pipeline_text2image = AutoPipelineForText2Image.from_pretrained(
-    #     "stabilityai/stable-diffusion-2-1-base",  #
-    #     torch_dtype=torch.float16,
-    #     variant="fp16",
-    #     use_safetensors=True
-    # ).to("cuda")
+    pipeline_text2image = AutoPipelineForText2Image.from_pretrained(
+        "stabilityai/stable-diffusion-2-1-base",  #
+        torch_dtype=torch.float16,
+        variant="fp16",
+        use_safetensors=True
+    ).to("cuda")
     
     rospy.loginfo("Ready to listen.")
     
@@ -199,43 +199,42 @@ if __name__ == "__main__":
             prompt = "a tree with a single trunk and a sparse canopy of leaves" 
             rospy.loginfo(f"Prompt: {prompt}")
         
-        # threshold_image, threshold_image_name = stroke_func.prompt_to_line_art_img(prompt, filename, pipeline_text2image)
-        # stroke_list = stroke_func.img_to_svg_to_stroke(filename, threshold_image_name)
+        threshold_image, threshold_image_name = stroke_func.prompt_to_line_art_img(prompt, filename, pipeline_text2image)
+        stroke_list = stroke_func.img_to_svg_to_stroke(filename, threshold_image_name)
         
-        # output_dir = "drawing_data"
-        # output_dir = os.path.join(os.path.dirname(script_path), output_dir)
+        output_dir = "drawing_data"
+        output_dir = os.path.join(os.path.dirname(script_path), output_dir)
         
-        # if not os.path.exists(output_dir):
-        #     os.makedirs(output_dir, exist_ok=True)
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir, exist_ok=True)
             
-        # csv_filename = f"refined_{filename}"
-        # path_to_save = os.path.join(output_dir, csv_filename)
-        # refine_stroke_and_to_csv(path_to_save, stroke_list=stroke_list)
-        # rospy.loginfo(f"Stroke data saved to {path_to_save}.")
-        
+        csv_filename = f"refined_{filename}"
+        path_to_save = os.path.join(output_dir, csv_filename)
+        refined_strokes = refine_stroke_and_to_csv(path_to_save, stroke_list=stroke_list)
+        rospy.loginfo(f"Stroke data saved to {path_to_save}.")
+
         try:
             # Create the service proxy
             drawing_service = rospy.ServiceProxy("drawing_request", DrawingRequest)
             complete_service = rospy.ServiceProxy("drawing_completed", DrawingCompleted)
             
             # Read the CSV files
-            script_dir = os.path.dirname(os.path.abspath(__file__))
-            csv_files = glob(os.path.join(script_dir, 'drawing_data/*.csv'))
-            rospy.loginfo(f"Found {len(csv_files)} csv files.")
+            # script_dir = os.path.dirname(os.path.abspath(__file__))
+            # csv_files = glob(os.path.join(script_dir, 'drawing_data/*.csv'))
+            # rospy.loginfo(f"Found {len(csv_files)} csv files.")
             
             # Process each file
-            for file_path in csv_files:
+            for data in [refined_strokes]:
                 
-                data = pd.read_csv(file_path)               
+                # data = pd.read_csv(file_path)               
                 
                 filtered_data = filter_out(data)
-                
                 # Cluster
                 clusters = []         # Will store tuples: (order, x, y, cluster_id)
                 current_cluster = []  # Temporary list for the current cluster's points
                 cluster_id = 0
                 order_index = 0       # Overall order index
-
+                
                 # Iterate through each row of the CSV to form clusters.
                 for idx, row in enumerate(filtered_data):
                     # row[0]: x, row[1]: y, row[2]: z
@@ -248,6 +247,7 @@ if __name__ == "__main__":
                         cluster_id += 1
 
                 # 클러스터 데이터프레임 생성
+                
                 clustered_df = pd.DataFrame(clusters, columns=['order', 'x', 'y', 'z', 'cluster'])
                 
                 # 각 클러스터의 시작점과 끝점 계산.
@@ -261,7 +261,7 @@ if __name__ == "__main__":
                     end_y=('y', 'last'),
                     end_z=('z', 'last') 
                 ).reset_index()
-
+                
                 # Check 'z' unique values
                 from utils.trajectory_optimization import nearest_neighbor_tsp_clusters, total_distance
                 # Get the TSP visitation order for clusters (starting from cluster 0).
@@ -278,23 +278,22 @@ if __name__ == "__main__":
                 
                 
                 original_order_df = clustered_df.sort_values(by='order').reset_index(drop=True)
-                distance_original = total_distance(original_order_df)
-                distance_optimized = total_distance(sorted_waypoints)
-                print("Total travel distance (original order):", distance_original)
-                print("Total travel distance (optimized order):", distance_optimized)
-                improvement = (distance_original - distance_optimized) / distance_original * 100
-                print("Gained improvement (%)", improvement)
                 
-                print(filtered_data)
-                print(sorted_waypoints)
+                distance_original = total_distance(original_order_df)
+                
+                distance_optimized = total_distance(sorted_waypoints)
+                
+                improvement = (distance_original - distance_optimized) / distance_original * 100
+                rospy.loginfo(f"Total travel distance {distance_original:.3f}(original order)")
+                rospy.loginfo(f"Total travel distance {distance_optimized:.3f}(optimized order)")
+                rospy.loginfo(f"Gained improvement {improvement:.3f}(%)")
                 
                 transformed_pts = transform(sorted_waypoints[['x', 'y', 'z']].to_numpy())
                 # transformed_pts = transform(filtered_data)  
                 
-                print(transformed_pts)
                 # Convert to Point[] message
                 points_msg = numpy_to_point_array(transformed_pts)
-
+                
                 rospy.loginfo("Sending points to the drawing server.")
                 
                 # Call the service
@@ -302,15 +301,26 @@ if __name__ == "__main__":
                 response = drawing_service(points_msg)
                 
                 if response.success:
-                    rospy.logwarn(f"Drawing Requested for file: {file_path}")
+                    rospy.logwarn(f"Drawing Requested for : {prompt}")
                 else:
-                    rospy.logerr(f"Failed to requesting drawing for file: {file_path}")
+                    rospy.logerr(f"Failed to requesting drawing for file: {prompt}")
+
+                log_file = f"duration_log.txt"
+                log_dir = os.path.dirname(log_file)
+
+                # 디렉토리가 없다면 생성
+                if log_dir and not os.path.exists(log_dir):
+                    os.makedirs(log_dir)
 
                 while not complete_service().success:
                     # rospy.loginfo("Waiting for the drawing server to complete the task.")
                     rospy.sleep(1)
                     duration = time.time() - start 
                     rospy.loginfo(f"Service call took {duration} seconds.")
+                    
+                    # Save the duration log to a file
+                    with open(f"duration_log.txt", 'a') as f:
+                        f.write(f"{prompt}, {duration}\n")
                     if rospy.is_shutdown():
                         break
                     
@@ -319,4 +329,6 @@ if __name__ == "__main__":
             
         finally:
             rospy.loginfo("Drawing request completed.")
+            
+            
             break

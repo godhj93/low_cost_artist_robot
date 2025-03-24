@@ -1,6 +1,6 @@
 import json
 import copy
-
+import pandas as pd
 
 def refine_stroke_and_to_csv(refined_filename, filename=None, stroke_list=None):
     if filename is not None:
@@ -25,3 +25,9 @@ def refine_stroke_and_to_csv(refined_filename, filename=None, stroke_list=None):
         for i in refined_strokes:
             f.write(f"{i[0]},{i[1]},{i[2]}\n")
         f.close()
+        
+        refined_strokes_df = pd.DataFrame(refined_strokes, columns=['x', 'y', 'z'], index=None)
+        refined_strokes_df.to_csv(f'{refined_filename}.csv', index=False)
+        
+    return refined_strokes_df
+    
